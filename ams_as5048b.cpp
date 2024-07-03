@@ -32,7 +32,7 @@
 AMS_AS5048B::AMS_AS5048B(void) {
 	_chipAddress = AS5048_ADDRESS;
 	_debugFlag = false;
-	_is_connected = 
+	_is_connected = false;
 }
 
 AMS_AS5048B::AMS_AS5048B(uint8_t chipAddress) {
