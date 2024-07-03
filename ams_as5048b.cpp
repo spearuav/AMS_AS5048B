@@ -79,7 +79,16 @@ void AMS_AS5048B::begin(void) {
 	return;
 }
 
+/**************************************************************************/
+/*!
+    @brief  checks if device is connected
 
+    @params
+				none
+    @returns
+				bool is device connected
+*/
+/**************************************************************************/
 bool AMS_AS5048B::isConnected()
 {
     Wire.beginTransmission(_chipAddress);
