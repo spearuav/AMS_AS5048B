@@ -32,6 +32,7 @@
 AMS_AS5048B::AMS_AS5048B(void) {
 	_chipAddress = AS5048_ADDRESS;
 	_debugFlag = false;
+	_is_connected = 
 }
 
 AMS_AS5048B::AMS_AS5048B(uint8_t chipAddress) {
@@ -66,6 +67,8 @@ void AMS_AS5048B::begin(void) {
 		}
 	#endif
 
+	_is_connected = isConnected();
+
 	_clockWise = false;
 	_lastAngleRaw = 0.0;
 	_zeroRegVal = AMS_AS5048B::zeroRegR();
@@ -75,6 +78,15 @@ void AMS_AS5048B::begin(void) {
 
 	return;
 }
+
+
+bool AMS_AS5048B::isConnected()
+{
+    Wire.beginTransmission(_chipAddress);
+    return Wire.endTransmission() == 0;    
+}
+
+
 
 /**************************************************************************/
 /*!
@@ -423,64 +435,72 @@ void AMS_AS5048B::resetMovingAvgExp(void) {
 
 uint8_t AMS_AS5048B::readReg8(uint8_t address) {
 
-	uint8_t readValue;
-	byte requestResult;
-	uint8_t nbByte2Read = 1;
+	if(_is_connected)
+	{
+		uint8_t readValue;
+		byte requestResult;
+		uint8_t nbByte2Read = 1;
 
-	Wire.beginTransmission(_chipAddress);
-	Wire.write(address);
-	requestResult = Wire.endTransmission(false);
-	if (requestResult){
-		Serial.print("I2C error: ");
-		Serial.println(requestResult);
+		Wire.beginTransmission(_chipAddress);
+		Wire.write(address);
+		requestResult = Wire.endTransmission(false);
+		if (requestResult){
+			Serial.print("I2C error: ");
+			Serial.println(requestResult);
+		}
+
+		Wire.requestFrom(_chipAddress, nbByte2Read);
+		readValue = (uint8_t) Wire.read();
+
+		return readValue;
 	}
-
-	Wire.requestFrom(_chipAddress, nbByte2Read);
-	readValue = (uint8_t) Wire.read();
-
-	return readValue;
+	return 0;
 }
 
 uint16_t AMS_AS5048B::readReg16(uint8_t address) {
 	//16 bit value got from 2 8bits registers (7..0 MSB + 5..0 LSB) => 14 bits value
 
-	uint8_t nbByte2Read = 2;
-	byte requestResult;
-	byte readArray[2];
-	uint16_t readValue = 0;
+	if (_is_connected)
+	{
+		uint8_t nbByte2Read = 2;
+		byte requestResult;
+		byte readArray[2];
+		uint16_t readValue = 0;
 
 #ifdef _VARIANT_ARDUINO_DUE_X_
-    requestResult = Wire.requestFrom((uint8_t) _chipAddress, nbByte2Read, address, 1, false);
-    if (requestResult == 0) {
-        Serial.print("I2C error: ");
-        Serial.println(requestResult);
-        // This needs to be fixed with an error code. 0 can be a valid register value.
-        return readValue;
+    	requestResult = Wire.requestFrom((uint8_t) _chipAddress, nbByte2Read, address, 1, false);
+    	if (requestResult == 0) {
+	        Serial.print("I2C error: ");
+        	Serial.println(requestResult);
+        	// This needs to be fixed with an error code. 0 can be a valid register value.
+        	return readValue;
     }
 #else
-    Wire.beginTransmission(_chipAddress);
-    Wire.write(address);
-    requestResult = Wire.endTransmission(false);
-    if (requestResult) {
-        Serial.print("I2C error: ");
-        Serial.println(requestResult);
-    }
+    	Wire.beginTransmission(_chipAddress);
+    	Wire.write(address);
+    	requestResult = Wire.endTransmission(false);
+    	if (requestResult) {
+	        Serial.print("I2C error: ");
+        	Serial.println(requestResult);
+    	}
 
-    Wire.requestFrom(_chipAddress, nbByte2Read);
+	    Wire.requestFrom(_chipAddress, nbByte2Read);
 #endif
 
-	for (byte i=0; i < nbByte2Read; i++) {
-		readArray[i] = Wire.read();
-	}
+		for (byte i=0; i < nbByte2Read; i++) {
+			readArray[i] = Wire.read();
+		}
 
-	readValue = (((uint16_t) readArray[0]) << 6);
-	readValue += (readArray[1] & 0x3F);
-	/*
-	Serial.println(readArray[0], BIN);
-	Serial.println(readArray[1], BIN);
-	Serial.println(readValue, BIN);
-	*/
-	return readValue;
+		readValue = (((uint16_t) readArray[0]) << 6);
+		readValue += (readArray[1] & 0x3F);
+		/*
+		Serial.println(readArray[0], BIN);
+		Serial.println(readArray[1], BIN);
+		Serial.println(readValue, BIN);
+		*/
+		return readValue;
+	}
+	return 0;
 }
 
 void AMS_AS5048B::writeReg(uint8_t address, uint8_t value) {

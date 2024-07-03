@@ -119,6 +119,7 @@ class AMS_AS5048B {
 	double		angleR(int unit = U_RAW, boolean newVal = true); //Read current angle or get last measure with unit conversion : RAW, TRN, DEG, RAD, GRAD, MOA, SOA, MILNATO, MILSE, MILRU
 	uint8_t		getAutoGain(void);
 	uint8_t		getDiagReg(void);
+	bool 		isConnected(void);
 
 	void		updateMovingAvgExp(void); //measure the current angle and feed the Exponential Moving Average calculation
 	double		getMovingAvgExp(int unit = U_RAW); //get Exponential Moving Average calculation
@@ -137,6 +138,7 @@ class AMS_AS5048B {
 	double		_movingAvgExpCos;
 	double		_movingAvgExpAlpha;
 	int		_movingAvgCountLoop;
+	bool 	_is_connected;
 
 	//methods
 	uint8_t		readReg8(uint8_t address);
