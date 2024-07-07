@@ -1,0 +1,27 @@
+{
+    "name": "AMS_AS5048B",
+    "version": "1.0.1",
+    "description": "I2C AMS_AS5048B encoder",
+    "keywords": "encoder, i2c, arduino",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/spearuav/AMS_AS5048B"
+    },
+    "authors":
+    [
+      {
+        "name": "sosandroid",
+        "url": "https://github.com/sosandroid"
+      },
+      {
+        "name": "Yair Shlomi",
+        "email": "info@spearuav.com",
+        "url": "https://www.spearuav.com"
+      }
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/spearuav",
+	"frameworks": "arduino",
+    "platforms": "*"
+  }
